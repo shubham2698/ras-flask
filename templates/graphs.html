@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Graphical Report</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js">
+
+</head>
+<body>
+
+
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <canvas id="myChart" style="width:100%;max-width:600px" height="400"></canvas>
+    </div>
+    <div class="col">
+      <canvas id="myChart-1" style="width:100%;max-width:600px" height="400"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+    var xValues = ["Passed Boys", "Passed Girls", "Failed Boys", "Failed Girls"];
+    var yValues = {{result}};
+    var barColors = [
+      "#b91d47",
+      "#00aba9",
+      "#2b5797",
+      "#1e7145"
+    ];
+
+    new Chart("myChart", {
+      type: "pie",
+      data: {
+        labels: xValues,
+        datasets: [{
+          backgroundColor: barColors,
+          data: yValues
+        }]
+      },
+      options: {
+        title: {
+          display: true,
+          text: "Result MCA 2020 SEM 2"
+        }
+      }
+    });
+</script>
+
+<script>
+    var xValues = ["Passed Boys", "Passed Girls", "Failed Boys", "Failed Girls"];
+    var yValues = {{result}};
+    var barColors = [
+      "#b91d47",
+      "#00aba9",
+      "#2b5797",
+      "#1e7145"
+    ];
+
+    new Chart("myChart-1", {
+      type: "pie",
+      data: {
+        labels: xValues,
+        datasets: [{
+          backgroundColor: barColors,
+          data: yValues
+        }]
+      },
+      options: {
+        title: {
+          display: true,
+          text: "Result MCA 2020 SEM 2"
+        }
+      }
+    });
+</script>
+
+
+
+</body>
+</html>
