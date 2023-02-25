@@ -11,29 +11,39 @@
 <body>
 
 
+
 <div class="container">
+
   <div class="row">
-    <div class="col">
-      <canvas id="myChart" style="width:100%;max-width:600px" height="400"></canvas>
+    <div class="col" style="margin-left: -400px;">
+      <canvas id="myChart" width="250" height="140"></canvas>
     </div>
-    <div class="col">
-      <canvas id="myChart-1" style="width:100%;max-width:600px" height="400"></canvas>
-    </div>
+
+      <div class="col">
+        <canvas id="line-chart" width="800" height="450"></canvas>
+      </div>
   </div>
+
 </div>
+
+
+
+
 
 <script>
     var xValues = ["Passed Boys", "Passed Girls", "Failed Boys", "Failed Girls"];
-    var yValues = {{result}};
+    var yValues = {{pie}};
+
     var barColors = [
       "#b91d47",
       "#00aba9",
       "#2b5797",
-      "#1e7145"
+      "#1e7145",
+      "#1e7156"
     ];
 
     new Chart("myChart", {
-      type: "pie",
+      type: "doughnut",
       data: {
         labels: xValues,
         datasets: [{
@@ -51,33 +61,37 @@
 </script>
 
 <script>
-    var xValues = ["Passed Boys", "Passed Girls", "Failed Boys", "Failed Girls"];
-    var yValues = {{result}};
-    var barColors = [
-      "#b91d47",
-      "#00aba9",
-      "#2b5797",
-      "#1e7145"
-    ];
 
-    new Chart("myChart-1", {
-      type: "pie",
+    var subjects = {{sl[0]}};
+    var avg = {{sl[2]}};
+
+    var xValues = subjects;
+    var yValues = avg;
+
+    new Chart("line-chart", {
+      type: "line",
       data: {
         labels: xValues,
         datasets: [{
-          backgroundColor: barColors,
+          fill: false,
+          lineTension: 0,
+          backgroundColor: "rgba(0,0,255,1.0)",
+          borderColor: "Tomato",
           data: yValues
         }]
       },
       options: {
+        legend: {display: true},
         title: {
           display: true,
-          text: "Result MCA 2020 SEM 2"
-        }
+          text: "Average Marks Of Semester 2 Students in Subject Code"
+        },
+
       }
     });
-</script>
 
+
+</script>
 
 
 </body>

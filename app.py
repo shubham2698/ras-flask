@@ -1,23 +1,8 @@
-from flask import Flask , render_template,request ,flash,redirect,url_for,jsonify
-import pymysql
+from flask import Flask , render_template,request ,flash , session
+from functions import *
 
-def connect_database_server():
-    try:
-        connection = pymysql.connect(host="localhost", user="root", passwd="")
-        db = connection.cursor()
-        return db,connection
-    except:
-        print("\033[91mFAILED TO CONNECT WITH YOUR DATABASE\033[0m")
-        exit()
 
-def connect_database(dbName):
-    try:
-        connection = pymysql.connect(host="localhost", user="root", passwd="", database=f"{dbName}")
-        db = connection.cursor()
-        return db,connection
-    except:
-        print("\033[91mFAILED TO CONNECT WITH YOUR DATABASE\033[0m")
-        exit()
+
 
 
 app = Flask(__name__)
@@ -47,7 +32,6 @@ def login():
             return render_template(r"login.html")
 
 
-
 @app.route('/register',methods=['POST','GET'])
 def register():
     if request.method == 'GET':
@@ -70,7 +54,6 @@ def register():
             return render_template(r"register.html")
 
 
-
 @app.route('/',methods=['POST','GET'])
 def dash():
     if request.method == 'GET':
@@ -84,31 +67,34 @@ def dash():
                 pass
             else:
                 result_f.append(each[0])
+        db.close()
         return render_template(r'dashboard.html',result_f=result_f)
 
 
-@app.route('/getData/<db_name>',methods=['POST','GET'])
-def getData(db_name):
+@app.route('/getData/<db_name>/<sem>',methods=['POST','GET'])
+def getSemAnalysis(db_name,sem):
     if request.method == 'GET':
         db, connection = connect_database(db_name)
-        db.execute(f"SELECT COUNT(DISTINCT(`NAME OF STUDENT`)) FROM mca2020_all WHERE SEM=2 AND `SUBJECT CODE`=121 OR `SUBJECT CODE`=111")
-        result = db.fetchall()
-        total_student=result[0][0]
-        db.execute(f"SELECT COUNT(DISTINCT(`NAME OF STUDENT`)) FROM mca2020_all WHERE SEM=2 AND `SEM 2`!='F' AND `GENDER`=' M'")
-        result = db.fetchall()
-        passedBoys = int(result[0][0])
-        db.execute(f"SELECT COUNT(DISTINCT(`NAME OF STUDENT`)) FROM mca2020_all WHERE SEM=2 AND `SEM 2`!='F' AND `GENDER`=' F'")
-        result = db.fetchall()
-        passedGirls = int(result[0][0])
-        db.execute(f"SELECT COUNT(DISTINCT(`NAME OF STUDENT`)) FROM mca2020_all WHERE SEM=2 AND `SEM 2`='F' AND `GENDER`=' M'")
-        result = db.fetchall()
-        failedBoys = int(result[0][0])
-        db.execute(f"SELECT COUNT(DISTINCT(`NAME OF STUDENT`)) FROM mca2020_all WHERE SEM=2 AND `SEM 2`='F' AND `GENDER`=' F'")
-        result = db.fetchall()
-        failedGirls = int(result[0][0])
-        res=[passedBoys,passedGirls,failedBoys,failedGirls]
-        return render_template(r'graphs.html',result=res)
+        sl,mi,a,mx,fa,ba=get_subject_analysis(db,sem)
+        sl=convert_listItems_int(sl)
+        mi=convert_listItems_int(mi)
+        a=convert_listItems_int(a)
+        mx=convert_listItems_int(mx)
+        fa=convert_listItems_int(fa)
+        ba=convert_listItems_int(ba)
+        arr=[sl,mi,a,mx,fa,ba]
+        pie = pieChart(db,sem)
+        return render_template(r'graphs.html',pie=pie,sl=arr)
 
+
+@app.route('/getData/<db_name>',methods=['POST','GET'])
+def getSem(db_name):
+    if request.method == 'GET':
+        db, connection = connect_database(db_name)
+        tableN=get_table_name(db,db_name)
+        session['tableN'] = tableN
+        semList = get_sem_list(db,tableN)
+        return render_template(r'semInfo.html', semList=semList,d=db_name)
 
 
 if __name__ == '__main__':
