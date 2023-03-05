@@ -50,7 +50,7 @@ def get_subjectList(db,sem):
         subjectList.append(each[0])
     return subjectList
 
-def get_subject_analysis(db,sem):
+def get_subject_analysis(db,sem,table_name):
     subjectList=get_subjectList(db,sem)
     if "423" in subjectList:
         subjectList.remove("423")
@@ -62,7 +62,7 @@ def get_subject_analysis(db,sem):
     analysis_data=[]
 
     for i in range(len(subjectList)):
-        db.execute(f"SELECT MAX(`EXTERNAL`) FROM {session['tableN']} WHERE SEM={sem} AND `SUBJECT CODE`='{subjectList[i]}' AND `EXTERNAL`!=0 AND `EXTERNAL`!=' AA'")
+        db.execute(f"SELECT MAX(`EXTERNAL`) FROM {table_name} WHERE SEM={sem} AND `SUBJECT CODE`='{subjectList[i]}' AND `EXTERNAL`!=0 AND `EXTERNAL`!=' AA'")
         result = db.fetchall()
 
         if result[0][0] != 0.0 and result[0][0] != None:
@@ -70,30 +70,30 @@ def get_subject_analysis(db,sem):
             max_m = int(result[0][0])
 
             db.execute(
-                f"SELECT MIN(`EXTERNAL`) FROM {session['tableN']} WHERE SEM={sem} AND `SUBJECT CODE`='{subjectList[i]}' AND `EXTERNAL`!=0 AND `EXTERNAL`!=' AA'")
+                f"SELECT MIN(`EXTERNAL`) FROM {table_name} WHERE SEM={sem} AND `SUBJECT CODE`='{subjectList[i]}' AND `EXTERNAL`!=0 AND `EXTERNAL`!=' AA'")
             result = db.fetchall()
             minMarksbarChartDict[f"'{subjectList[i]}'"] = int(result[0][0])
             min_m = int(result[0][0])
 
             db.execute(
-                f"SELECT AVG(`EXTERNAL`) FROM {session['tableN']} WHERE SEM={sem} AND `SUBJECT CODE`='{subjectList[i]}'")
+                f"SELECT AVG(`EXTERNAL`) FROM {table_name} WHERE SEM={sem} AND `SUBJECT CODE`='{subjectList[i]}'")
             result = db.fetchall()
             avgMarksbarChartDict[f"'{subjectList[i]}'"] = round(result[0][0], 2)
             avg_m = round(result[0][0], 2)
 
             db.execute(
-                f"SELECT COUNT(DISTINCT(`NAME OF STUDENT`)) FROM {session['tableN']} WHERE SEM={sem} AND `SUBJECT CODE`='{subjectList[i]}' AND `GRADE POINT`!='FF'")
+                f"SELECT COUNT(DISTINCT(`NAME OF STUDENT`)) FROM {table_name} WHERE SEM={sem} AND `SUBJECT CODE`='{subjectList[i]}' AND `GRADE POINT`!='FF'")
             result = db.fetchall()
             passed_stud = int(result[0][0])
 
             db.execute(
-                f"SELECT COUNT(DISTINCT(`NAME OF STUDENT`)) FROM {session['tableN']} WHERE SEM={sem} AND `SUBJECT CODE`='{subjectList[i]}' AND `GRADE POINT`='FF'")
+                f"SELECT COUNT(DISTINCT(`NAME OF STUDENT`)) FROM {table_name} WHERE SEM={sem} AND `SUBJECT CODE`='{subjectList[i]}' AND `GRADE POINT`='FF'")
             result = db.fetchall()
             failedChartDict[f"'{subjectList[i]}'"] = int(result[0][0])
             fail_stud = int(result[0][0])
 
             db.execute(
-                f"SELECT COUNT(DISTINCT(`NAME OF STUDENT`)) FROM {session['tableN']} WHERE SEM={sem} AND `SUBJECT CODE`='{subjectList[i]}' AND `GRADE POINT`!='FF' AND `EXTERNAL` < {avg_m}")
+                f"SELECT COUNT(DISTINCT(`NAME OF STUDENT`)) FROM {table_name} WHERE SEM={sem} AND `SUBJECT CODE`='{subjectList[i]}' AND `GRADE POINT`!='FF' AND `EXTERNAL` < {avg_m}")
             result = db.fetchall()
             below_avg = int(result[0][0])
 
@@ -106,10 +106,10 @@ def get_subject_analysis(db,sem):
 
     return df_analysis['Subject'].values.tolist(), df_analysis['Min'].values.tolist(), df_analysis['Avg'].values.tolist(), df_analysis['Max'].values.tolist(), df_analysis['Failed'].values.tolist(),df_analysis['Below Average'].values.tolist()
 
-def get_sem_list(db,db_name):
+def get_sem_list(db,table_name):
     semList = []
-    db_n=db_name
-    db.execute(f"SELECT DISTINCT(`SEM`) FROM `{db_n}`")
+    tb_n=table_name
+    db.execute(f"SELECT DISTINCT(`SEM`) FROM `{tb_n}`")
     result = db.fetchall()
     for each in result:
         semList.append(each[0])

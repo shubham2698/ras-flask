@@ -1,4 +1,4 @@
-from flask import Flask , render_template,request ,flash , session
+from flask import Flask , render_template,request ,flash , session,redirect,url_for
 from functions import *
 
 
@@ -9,7 +9,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'wallpaperwide'
 
 
-@app.route('/login', methods=['POST','GET'])
+@app.route('/', methods=['POST','GET'])
 def login():
     if request.method == 'GET':
         return render_template(r"login.html")
@@ -23,7 +23,9 @@ def login():
         connection.close()
         try:
             if result[0][0] == password:
-                return render_template('dashboard.html',institute=result[0][1])
+                session["iname"]=str(result[0][1]).replace(" ","_")
+
+                return redirect(url_for('dash'))
             else:
                 flash('invalid password. Try Again..', category='error')
                 return render_template(r"login.html")
@@ -48,34 +50,41 @@ def register():
             db,connection = connect_database("ras")
             db.execute(f"INSERT INTO user_info (email_id,pass_word,institute_name) VALUES ('{email}','{password}','{iname}')")
             connection.commit()
+            db.execute(f"CREATE DATABASE {iname.replace(' ','_')}")
             db.close()
             connection.close()
             flash('Successfully Registered. Try to SIGN IN now ..', category='success')
             return render_template(r"register.html")
 
 
-@app.route('/',methods=['POST','GET'])
+@app.route('/dash',methods=['POST','GET'])
 def dash():
     if request.method == 'GET':
         db,connection=connect_database_server()
-        db.execute(f"show databases")
+        db.execute(f"SHOW TABLES FROM {session['iname']}")
         result = db.fetchall()
         result_f=[]
-        remove_d = ['information_schema', 'mysql', 'performance_schema', 'phpmyadmin']
         for each in result:
-            if each[0] in remove_d:
-                pass
-            else:
-                result_f.append(each[0])
+            result_f.append(each[0])
         db.close()
         return render_template(r'dashboard.html',result_f=result_f)
 
 
-@app.route('/getData/<db_name>/<sem>',methods=['POST','GET'])
-def getSemAnalysis(db_name,sem):
+@app.route('/getData/<table_name>',methods=['POST','GET'])
+def getSem(table_name):
     if request.method == 'GET':
-        db, connection = connect_database(db_name)
-        sl,mi,a,mx,fa,ba=get_subject_analysis(db,sem)
+        db, connection = connect_database(session['iname'])
+        tableN=table_name
+        session['tableN'] = tableN
+        semList = get_sem_list(db,session['tableN'])
+        return render_template(r'semInfo.html', semList=semList)
+
+
+@app.route('/getData/<table_name>/<sem>',methods=['POST','GET'])
+def getSemAnalysis(table_name,sem):
+    if request.method == 'GET':
+        db, connection = connect_database(session["iname"])
+        sl,mi,a,mx,fa,ba=get_subject_analysis(db,sem,table_name)
         sl=convert_listItems_int(sl)
         mi=convert_listItems_int(mi)
         a=convert_listItems_int(a)
@@ -85,16 +94,6 @@ def getSemAnalysis(db_name,sem):
         arr=[sl,mi,a,mx,fa,ba]
         pie = pieChart(db,sem)
         return render_template(r'graphs.html',pie=pie,sl=arr)
-
-
-@app.route('/getData/<db_name>',methods=['POST','GET'])
-def getSem(db_name):
-    if request.method == 'GET':
-        db, connection = connect_database(db_name)
-        tableN=get_table_name(db,db_name)
-        session['tableN'] = tableN
-        semList = get_sem_list(db,tableN)
-        return render_template(r'semInfo.html', semList=semList,d=db_name)
 
 
 if __name__ == '__main__':

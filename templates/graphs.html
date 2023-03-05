@@ -13,17 +13,14 @@
 
 
 <div class="container">
-
   <div class="row">
     <div class="col" style="margin-left: -400px;">
       <canvas id="myChart" width="250" height="140"></canvas>
     </div>
-
-      <div class="col">
+     <div class="col">
         <canvas id="line-chart" width="800" height="450"></canvas>
-      </div>
+     </div>
   </div>
-
 </div>
 
 
@@ -81,11 +78,28 @@
         }]
       },
       options: {
-        legend: {display: true},
+        legend: {display: false},
         title: {
           display: true,
           text: "Average Marks Of Semester 2 Students in Subject Code"
         },
+  scales: {
+    yAxes: [{
+      scaleLabel: {
+        display: true,
+        labelString: 'Marks'
+      }
+    }],
+    xAxes: [{
+      scaleLabel: {
+        display: true,
+        labelString: 'Subject_Code'
+      }
+    }]
+  },
+
+
+
 
       }
     });

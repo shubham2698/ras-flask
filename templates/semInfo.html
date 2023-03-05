@@ -9,7 +9,7 @@
 <body>
     <div class="container-menu">
     {%for each in semList%}
-        <h2><a href="/getData/{{d}}/{{each}}">{{each}}</a></h2>
+        <h2><a href="/getData/{{session['tableN']}}/{{each}}">{{each}}</a></h2>
     {%endfor%}
 </div>
 </body>
