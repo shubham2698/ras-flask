@@ -59,6 +59,11 @@ def register():
 
 @app.route('/dash',methods=['POST','GET'])
 def dash():
+        return render_template(r'dashboard.html')
+
+
+@app.route('/dash/getAll',methods=['POST','GET'])
+def getAll():
     if request.method == 'GET':
         db,connection=connect_database_server()
         db.execute(f"SHOW TABLES FROM {session['iname']}")
@@ -67,7 +72,8 @@ def dash():
         for each in result:
             result_f.append(each[0])
         db.close()
-        return render_template(r'dashboard.html',result_f=result_f)
+        return render_template(r'allresult.html', result_f=result_f)
+
 
 
 @app.route('/getData/<table_name>',methods=['POST','GET'])
