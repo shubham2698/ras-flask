@@ -69,26 +69,21 @@ def getAll():
         db.execute(f"SHOW TABLES FROM {session['iname']}")
         result = db.fetchall()
         result_f=[]
+        db.close()
+        db, connection = connect_database(session['iname'])
         for each in result:
-            result_f.append(each[0])
+            print(each[0])
+            semList = get_sem_list(db, each[0])
+            data = [each[0],semList]
+            result_f.append(data)
         db.close()
         return render_template(r'allresult.html', result_f=result_f)
 
 
-
-@app.route('/getData/<table_name>',methods=['POST','GET'])
-def getSem(table_name):
-    if request.method == 'GET':
-        db, connection = connect_database(session['iname'])
-        tableN=table_name
-        session['tableN'] = tableN
-        semList = get_sem_list(db,session['tableN'])
-        return render_template(r'semInfo.html', semList=semList)
-
-
-@app.route('/getData/<table_name>/<sem>',methods=['POST','GET'])
+@app.route('/dash/getALl/<table_name>/<sem>',methods=['POST','GET'])
 def getSemAnalysis(table_name,sem):
     if request.method == 'GET':
+        session['tableN'] = table_name
         db, connection = connect_database(session["iname"])
         sl,mi,a,mx,fa,ba=get_subject_analysis(db,sem,table_name)
         sl=convert_listItems_int(sl)
@@ -99,7 +94,8 @@ def getSemAnalysis(table_name,sem):
         ba=convert_listItems_int(ba)
         arr=[sl,mi,a,mx,fa,ba]
         pie = pieChart(db,sem)
-        return render_template(r'graphs.html',pie=pie,sl=arr)
+        return render_template(r'graphs.html',pie=pie,sl=arr,sem=sem)
+
 
 
 if __name__ == '__main__':

@@ -139,10 +139,11 @@ color:white;
     color:#002046;
 }
 .allres{
-    height:100vw;
+    height:100vh;
     background-size:cover;
     padding-top:10%;
     padding-left:10%;
+    background-overlay:
 }
 
 
