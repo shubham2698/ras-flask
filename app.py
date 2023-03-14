@@ -80,7 +80,7 @@ def getAll():
         return render_template(r'allresult.html', result_f=result_f)
 
 
-@app.route('/dash/getALl/<table_name>/<sem>',methods=['POST','GET'])
+@app.route('/dash/getAll/<table_name>/<sem>',methods=['POST','GET'])
 def getSemAnalysis(table_name,sem):
     if request.method == 'GET':
         session['tableN'] = table_name

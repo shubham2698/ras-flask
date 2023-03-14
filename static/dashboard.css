@@ -146,10 +146,10 @@ color:white;
     background-overlay:
 }
 
-
-
-
-
+.graph{
+    height:100vh;
+    background-size:contain;
+}
 
 
 
